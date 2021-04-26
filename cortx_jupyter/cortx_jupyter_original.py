@@ -1,39 +1,62 @@
-import itertools
-import re
-from tornado.httpclient import (HTTPError as HTTPClientError)
-import mimetypes
 import asyncio
-from tornado.ioloop import IOLoop
-import time
-
-from tornado.web import HTTPError as HTTPServerError
 import base64
-import boto3
-from tornado.locks import Lock
-from types import SimpleNamespace
-
-import threading
-import datetime
-from traitlets import Dict,Unicode,Instance,TraitType,Type,default
-from traitlets.config.configurable import Configurable
-from notebook.services.contents.manager import ContentsManager
 from collections import namedtuple
-from tornado import gen
-from nbformat.v4 import new_notebook
+import datetime
+import hashlib
+import hmac
+import itertools
+import json
+import mimetypes
+import os
+import threading
+import re
+import time
+import urllib
+import xml.etree.ElementTree as ET
+import boto3
 import json 
 
-import nbformat
-import json
+from tornado import gen
+from tornado.httpclient import (
+    AsyncHTTPClient,
+    HTTPError as HTTPClientError,
+    HTTPRequest,
+)
+from tornado.ioloop import IOLoop
+from tornado.locks import Lock
+from tornado.web import HTTPError as HTTPServerError
+from traitlets.config.configurable import Configurable
+from traitlets import (
+    Dict,
+    Unicode,
+    Instance,
+    TraitType,
+    Type,
+    default,
+)
 
-Config = namedtuple('Config', [
- 'prefix', 'region', 'bucket_name', 'host_name', 'cortx_authenticator',
+import nbformat
+from nbformat.v4 import new_notebook
+from notebook.services.contents.manager import (
+    ContentsManager,
+)
+
+
+DIRECTORY_SUFFIX = '/'
+NOTEBOOK_SUFFIX = '.ipynb'
+CHECKPOINT_SUFFIX = '.checkpoints'
+UNTITLED_NOTEBOOK = 'Untitled'
+UNTITLED_FILE = 'Untitled'
+UNTITLED_DIRECTORY = 'Untitled Folder'
+
+Context = namedtuple('Context', [
+    'logger', 'prefix', 'region', 's3_bucket', 's3_host', 's3_auth',
     'multipart_uploads', 'endpoint_url'
 ])
-CredentialConfig = namedtuple('CredentialConfig', [
-    'access_key_id', 'secret_access_key'
+AwsCreds = namedtuple('AwsCreds', [
+    'access_key_id', 'secret_access_key', 'pre_auth_headers',
 ])
 
-cortx_constants = {'NB_TYPE' :'.ipynb', 'UNTITLED_FILE' :'Untitled', 'FOLDER_SEPERATOR' : '/', 'UNTITLED_NB' :'Untitled', 'UNTITLED_FOLDER' : 'Untitled Folder','CHECKPOINT_NAME' : '.checkpoints'}
 
 class ExpiringDict:
 
@@ -64,34 +87,42 @@ class ExpiringDict:
         del self._store[key]
 
 
-# class Datetime(TraitType):
-#     klass = datetime.datetime
-#     default_value = datetime.datetime(1900, 1, 1)
+class Datetime(TraitType):
+    klass = datetime.datetime
+    default_value = datetime.datetime(1900, 1, 1)
 
 
-class CortxAuthenticator(Configurable):
-    access_key_id = Unicode(config=True)
-    secret_access_key = Unicode(config=True)
+class CortxJupyterAuthentication(Configurable):
+
+    def get_credentials(self):
+        raise NotImplementedError()
+
+
+class CortxJupyterSecretAccessKeyAuthentication(CortxJupyterAuthentication):
+
+    aws_access_key_id = Unicode(config=True)
+    aws_secret_access_key = Unicode(config=True)
+    pre_auth_headers = Dict()
 
     @gen.coroutine
     def get_credentials(self):
-        return CredentialConfig(
-            access_key_id=self.access_key_id,
-            secret_access_key=self.secret_access_key,
+        return AwsCreds(
+            access_key_id=self.aws_access_key_id,
+            secret_access_key=self.aws_secret_access_key,
+            pre_auth_headers=self.pre_auth_headers,
         )
-
 
 
 class CortxJupyter(ContentsManager):
 
-    bucket_name = Unicode(config=True)
-    host_name = Unicode(config=True)
-    region_name = Unicode(config=True)
+    aws_s3_bucket = Unicode(config=True)
+    aws_s3_host = Unicode(config=True)
+    aws_region = Unicode(config=True)
     prefix = Unicode(config=True)
     endpoint_url = Unicode(config=True)
 
-    authentication_class = Type(CortxAuthenticator, config=True)
-    authentication = Instance(CortxAuthenticator)
+    authentication_class = Type(CortxJupyterAuthentication, config=True)
+    authentication = Instance(CortxJupyterAuthentication)
 
     @default('authentication')
     def _default_authentication(self):
@@ -118,11 +149,14 @@ class CortxJupyter(ContentsManager):
     def is_hidden(self, path):
         return False
 
+    # The next functions are not expected to be coroutines
+    # or return futures. They have to block the event loop.
+
     def dir_exists(self, path):
 
         @gen.coroutine
         def dir_exists_async():
-            return (yield _dir_exists(self._config(), path))
+            return (yield _dir_exists(self._context(), path))
 
         return _run_sync_in_new_thread(dir_exists_async)
 
@@ -130,7 +164,7 @@ class CortxJupyter(ContentsManager):
 
         @gen.coroutine
         def file_exists_async():
-            return (yield _file_exists(self._config(), path))
+            return (yield _file_exists(self._context(), path))
 
         return _run_sync_in_new_thread(file_exists_async)
 
@@ -138,65 +172,66 @@ class CortxJupyter(ContentsManager):
 
         @gen.coroutine
         def get_async():
-            return (yield _get(self._config(), path, content, type, format))
+            return (yield _get(self._context(), path, content, type, format))
 
         return _run_sync_in_new_thread(get_async)
 
     @gen.coroutine
     def save(self, model, path):
         with (yield self.write_lock.acquire()):
-            return (yield _save(self._config(), model, path))
+            return (yield _save(self._context(), model, path))
 
     @gen.coroutine
     def delete(self, path):
         with (yield self.write_lock.acquire()):
-            yield _delete(self._config(), path)
+            yield _delete(self._context(), path)
 
     @gen.coroutine
     def update(self, model, path):
         with (yield self.write_lock.acquire()):
-            return (yield _rename(self._config(), path, model['path']))
+            return (yield _rename(self._context(), path, model['path']))
 
     @gen.coroutine
     def new_untitled(self, path='', type='', ext=''):
         with (yield self.write_lock.acquire()):
-            return (yield _new_untitled(self._config(), path, type, ext))
+            return (yield _new_untitled(self._context(), path, type, ext))
 
     @gen.coroutine
     def new(self, model, path):
         with (yield self.write_lock.acquire()):
-            return (yield _new(self._config(), model, path))
+            return (yield _new(self._context(), model, path))
 
     @gen.coroutine
     def copy(self, from_path, to_path):
         with (yield self.write_lock.acquire()):
-            return (yield _copy(self._config(), from_path, to_path))
+            return (yield _copy(self._context(), from_path, to_path))
 
     @gen.coroutine
     def create_checkpoint(self, path):
         with (yield self.write_lock.acquire()):
-            return (yield _create_checkpoint(self._config(), path))
+            return (yield _create_checkpoint(self._context(), path))
 
     @gen.coroutine
     def restore_checkpoint(self, checkpoint_id, path):
         with (yield self.write_lock.acquire()):
-            return (yield _restore_checkpoint(self._config(), checkpoint_id, path))
+            return (yield _restore_checkpoint(self._context(), checkpoint_id, path))
 
     @gen.coroutine
     def list_checkpoints(self, path):
-        return (yield _list_checkpoints(self._config(), path))
+        return (yield _list_checkpoints(self._context(), path))
 
     @gen.coroutine
     def delete_checkpoint(self, checkpoint_id, path):
         with (yield self.write_lock.acquire()):
-            return (yield _delete_checkpoint(self._config(), checkpoint_id, path))
+            return (yield _delete_checkpoint(self._context(), checkpoint_id, path))
 
-    def _config(self):
-        return Config(
-            region=self.region_name,
-            bucket_name=self.bucket_name,
-            host_name=self.host_name,
-            cortx_authenticator=self.authentication.get_credentials,
+    def _context(self):
+        return Context(
+            logger=self.log,
+            region=self.aws_region,
+            s3_bucket=self.aws_s3_bucket,
+            s3_host=self.aws_s3_host,
+            s3_auth=self.authentication.get_credentials,
             prefix=self.prefix,
             multipart_uploads=self.multipart_uploads,
             endpoint_url=self.endpoint_url
@@ -217,7 +252,7 @@ def _final_path_component(key_or_path):
 # The sort keys keep the UI as reasonable as possible with long running
 # actions acting on multiple objects, including if things fail in the middle
 def _copy_sort_key(key):
-    return (key.count('/'), 0 if key.endswith(cortx_constants['FOLDER_SEPERATOR']) else 1)
+    return (key.count('/'), 0 if key.endswith(DIRECTORY_SUFFIX) else 1)
 
 
 def _delete_sort_key(key):
@@ -229,7 +264,7 @@ def _delete_sort_key(key):
 @gen.coroutine
 def _type_from_path(context, path):
     type = \
-        'notebook' if path.endswith(cortx_constants["NB_TYPE"]) else \
+        'notebook' if path.endswith(NOTEBOOK_SUFFIX) else \
         'directory' if _is_root(path) or (yield _dir_exists(context, path)) else \
         'file'
     return type
@@ -246,14 +281,14 @@ def _format_from_type_and_path(context, type, path):
 
 def _type_from_path_not_directory(path):
     type = \
-        'notebook' if path.endswith(cortx_constants["NB_TYPE"]) else \
+        'notebook' if path.endswith(NOTEBOOK_SUFFIX) else \
         'file'
     return type
 
 
 @gen.coroutine
 def _dir_exists(context, path):
-    return True if _is_root(path) else (yield _file_exists(context, path + cortx_constants["FOLDER_SEPERATOR"]))
+    return True if _is_root(path) else (yield _file_exists(context, path + DIRECTORY_SUFFIX))
 
 
 def _is_root(path):
@@ -269,7 +304,7 @@ def _file_exists(context, path):
     def key_exists():
         key = _key(context, path)
         try:
-            response = yield _head_object(context, context.bucket_name, key)
+            response = yield _head_object(context, context.s3_bucket, key)
             
         except HTTPClientError as exception:
             if exception.response.code != 404:
@@ -313,7 +348,7 @@ def _get_file_text(context, path, content):
 def _get_any(context, path, content, type, mimetype, format, decode):
     method = 'GET' if content else 'HEAD'
     key = _key(context, path)
-    response = yield _get_object(context, context.bucket_name, key)
+    response = yield _get_object(context, context.s3_bucket, key)
     file_bytes = response['Body'].read()
     last_modified_str = response['LastModified']
     if not isinstance(last_modified_str, str):
@@ -370,7 +405,7 @@ def _get_directory(context, path, content):
                 'last_modified': last_modified,
             }
             for (key, last_modified) in keys
-            if not key.endswith(cortx_constants["FOLDER_SEPERATOR"])
+            if not key.endswith(DIRECTORY_SUFFIX)
         ]) if content else None
     }
 
@@ -405,7 +440,7 @@ def _save_file_text(context, chunk, content, path):
 
 @gen.coroutine
 def _save_directory(context, chunk, content, path):
-    return (yield _save_any(context, chunk, b'', path + cortx_constants["FOLDER_SEPERATOR"], 'directory', None))
+    return (yield _save_any(context, chunk, b'', path + DIRECTORY_SUFFIX, 'directory', None))
 
 
 @gen.coroutine
@@ -438,7 +473,7 @@ def _save_chunk(context, chunk, content_bytes, path, type, mimetype):
 def _save_bytes(context, content_bytes, path, type, mimetype):
 
     object_name = _key(context, path)
-    response = _put_object(context, context.bucket_name, content_bytes, object_name)
+    response = _put_object(context, context.s3_bucket, content_bytes, object_name)
     last_modified = f"{datetime.datetime.now():%a, %d %b %Y %H:%M:%S GMT}"
 
     return _saved_model(path, type, mimetype, last_modified)
@@ -472,7 +507,7 @@ def _increment_filename(context, filename, path='', insert=''):
 
 
 def _checkpoint_path(path, checkpoint_id):
-    return path + '/' + cortx_constants["CHECKPOINT_NAME"] + '/' + checkpoint_id
+    return path + '/' + CHECKPOINT_SUFFIX + '/' + checkpoint_id
 
 
 @gen.coroutine
@@ -515,11 +550,11 @@ def _delete_checkpoint(context, checkpoint_id, path):
 
 @gen.coroutine
 def _list_checkpoints(context, path):
-    key_prefix = _key(context, path + '/' + cortx_constants["CHECKPOINT_NAME"] + '/')
+    key_prefix = _key(context, path + '/' + CHECKPOINT_SUFFIX + '/')
     keys, _ = yield _list_immediate_child_keys_and_directories(context, key_prefix)
     return [
         {
-            'id': key[(key.rfind('/' + cortx_constants["CHECKPOINT_NAME"] + '/') + len('/' + cortx_constants["CHECKPOINT_NAME"] + '/')):],
+            'id': key[(key.rfind('/' + CHECKPOINT_SUFFIX + '/') + len('/' + CHECKPOINT_SUFFIX + '/')):],
             'last_modified': last_modified,
         }
         for key, last_modified in keys
@@ -565,8 +600,9 @@ def _rename(context, old_path, new_path):
 
 @gen.coroutine
 def _copy_key(context, old_key, new_key):
+    # yield _copy_object(context, context.s3_bucket, f'/{context.s3_bucket}/{old_key}', new_key)
 
-    yield _copy_object(context, context.bucket_name, old_key, new_key)
+    yield _copy_object(context, context.s3_bucket, old_key, new_key)
 
 
 @gen.coroutine
@@ -592,7 +628,7 @@ def _delete(context, path):
 
 @gen.coroutine
 def _delete_key(context, key):
-    yield _delete_object(context, context.bucket_name, key)
+    yield _delete_object(context, context.s3_bucket, key)
 
 
 @gen.coroutine
@@ -606,9 +642,9 @@ def _new_untitled(context, path, type, ext):
         'file'
 
     untitled = \
-        cortx_constants["UNTITLED_FOLDER"] if model_type == 'directory' else \
-        cortx_constants["UNTITLED_NB"] if model_type == 'notebook' else \
-        cortx_constants["UNTITLED_FILE"]
+        UNTITLED_DIRECTORY if model_type == 'directory' else \
+        UNTITLED_NOTEBOOK if model_type == 'notebook' else \
+        UNTITLED_FILE
     insert = \
         ' ' if model_type == 'directory' else \
         ''
@@ -690,12 +726,12 @@ def _list_keys(context, key_prefix, delimiter):
 
     @gen.coroutine
     def _list_first_page():
-        response = yield _list_objects(context, context.bucket_name, key_prefix, delimiter, max_keys)
+        response = yield _list_objects(context, context.s3_bucket, key_prefix, delimiter, max_keys)
         return _parse_list_response(response)
 
     @gen.coroutine
     def _list_later_page(token):
-        response = yield _list_objects(context, context.bucket_name, key_prefix, delimiter, max_keys, token)
+        response = yield _list_objects(context, context.s3_bucket, key_prefix, delimiter, max_keys, token)
 
         return _parse_list_response(response)
 
@@ -769,10 +805,11 @@ SAVERS = {
     ('directory', 'json'): _save_directory,
 }
 
+# 'endpoint_url': AwsCreds.endpoint_url,
 
 @gen.coroutine
 def _head_object(context, bucket, key):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url= context.endpoint_url)
     response = s3_client.list_objects_v2(
@@ -788,14 +825,14 @@ def _head_object(context, bucket, key):
 
 @gen.coroutine
 def _put_object(context, bucket, body, object_name):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url= context.endpoint_url)
     return s3_client.put_object(Body=body, Bucket=bucket, Key=object_name)
 
 @gen.coroutine
 def _get_object(context, bucket, object_name):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url= context.endpoint_url)
     return s3_client.get_object(Bucket=bucket, Key=object_name)
@@ -803,32 +840,41 @@ def _get_object(context, bucket, object_name):
 @gen.coroutine
 def _list_buckets(context):
     # Retrieve the list of existing buckets
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
     return s3_client.list_buckets()
 
 @gen.coroutine
 def _copy_object(context, bucket, source_file, destination_file):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
-    response = yield _get_object(context, context.bucket_name, source_file)
+    response = yield _get_object(context, context.s3_bucket, source_file)
     file_bytes = response['Body'].read()
-    response = _put_object(context, context.bucket_name, file_bytes, destination_file)
+    response = _put_object(context, context.s3_bucket, file_bytes, destination_file)
     last_modified = f"{datetime.datetime.now():%a, %d %b %Y %H:%M:%S GMT}"
     return _saved_model(destination_file.split('/')[-1], 'notebook', None, last_modified)
 
+
+# @gen.coroutine
+# def _copy_object(context, bucket, source_file, destination_file):
+#     credentials = yield context.s3_auth()
+#     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
+#                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
+    
+#     return s3_client.copy_object(Bucket=bucket, CopySource=source_file, Key=destination_file)
+
 @gen.coroutine
 def _delete_object(context, bucket, file_name):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
     return s3_client.delete_object(Bucket=bucket, Key=file_name)
 
 @gen.coroutine
 def _list_objects(context, bucket, prefix, delimiter, max_keys, token=''):
-    credentials = yield context.cortx_authenticator()
+    credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
     if token:

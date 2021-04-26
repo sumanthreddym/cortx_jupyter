@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='cortx_jupyter',
-    version='0.1.0',
+    version='0.1.5',
     author='Sumanth & Priya',
     description='Jupyter Notebook Manager for Cortx',
     long_description=long_description,
