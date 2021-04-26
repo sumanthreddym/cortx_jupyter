@@ -6,3 +6,5 @@ Jupyter Notebook Contents Manager for Seagate Cortx.
 
 Sumanth Reddy Muni
 Priyadarshini Murugan
+
+```pip install cortx-jupyter```
