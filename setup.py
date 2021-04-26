@@ -5,11 +5,11 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='cortx_jupyter',
-    version='0.0.95',
+    version='0.1.0',
     author='Sumanth & Priya',
     description='Jupyter Notebook Manager for Cortx',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/sumanthreddym/cortx_jupyter',
+    url='https://github.com/sumanthreddym/cortx-jupyter',
     packages=setuptools.find_packages()
 )

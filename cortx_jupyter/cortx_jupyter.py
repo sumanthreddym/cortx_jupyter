@@ -238,15 +238,8 @@ class CortxJupyter(ContentsManager):
         )
 
 
-# The documentation suggests that leading slashes in the
-# path are not present, but they are, mostly
 def _key(context, path):
-    print(path)
-    print(path.lstrip('/'))
     return context.prefix + path.lstrip('/')
-    # return context.prefix + path
-
-
 
 def _path(context, key):
     return '/' + key[len(context.prefix):]
@@ -310,15 +303,10 @@ def _file_exists(context, path):
     @gen.coroutine
     def key_exists():
         key = _key(context, path)
-        # response = _head_object(context, context.s3_bucket, key)
-        # print('key',response)
-        # return response
-
         try:
             response = yield _head_object(context, context.s3_bucket, key)
             
         except HTTPClientError as exception:
-            print('file_exit',exception.response)
             if exception.response.code != 404:
                 raise HTTPServerError(exception.response.code, 'Error checking if S3 exists')
             response = exception.response
@@ -361,7 +349,6 @@ def _get_any(context, path, content, type, mimetype, format, decode):
     method = 'GET' if content else 'HEAD'
     key = _key(context, path)
     response = yield _get_object(context, context.s3_bucket, key)
-    print(response)
     file_bytes = response['Body'].read()
     last_modified_str = response['LastModified']
     if not isinstance(last_modified_str, str):
@@ -369,9 +356,7 @@ def _get_any(context, path, content, type, mimetype, format, decode):
     else:
         last_modified = datetime.datetime.strptime(
         last_modified_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-    # last_modified_str = response['LastModified']
-    # last_modified = datetime.datetime.strptime(
-    #     last_modified_str, "%a, %d %b %Y %H:%M:%S GMT")
+
     return {
         'name': _final_path_component(path),
         'path': path,
@@ -388,7 +373,6 @@ def _get_any(context, path, content, type, mimetype, format, decode):
 @gen.coroutine
 def _get_directory(context, path, content):
     key = _key(context, path)
-    print('indir',key)
     key_prefix = key if (key == '' or key[-1] == '/') else (key + '/')
     keys, directories = \
         (yield _list_immediate_child_keys_and_directories(context, key_prefix)) if content else \
@@ -487,12 +471,11 @@ def _save_chunk(context, chunk, content_bytes, path, type, mimetype):
 
 @gen.coroutine
 def _save_bytes(context, content_bytes, path, type, mimetype):
+
     object_name = _key(context, path)
     response = _put_object(context, context.s3_bucket, content_bytes, object_name)
-    print("put obj save bytes")
-    print(response)
-    # last_modified_str = response.headers['Date']
     last_modified = f"{datetime.datetime.now():%a, %d %b %Y %H:%M:%S GMT}"
+
     return _saved_model(path, type, mimetype, last_modified)
 
 
@@ -617,7 +600,9 @@ def _rename(context, old_path, new_path):
 
 @gen.coroutine
 def _copy_key(context, old_key, new_key):
-    yield _copy_object(context, context.s3_bucket, f'/{context.s3_bucket}/{old_key}', new_key)
+    # yield _copy_object(context, context.s3_bucket, f'/{context.s3_bucket}/{old_key}', new_key)
+
+    yield _copy_object(context, context.s3_bucket, old_key, new_key)
 
 
 @gen.coroutine
@@ -742,13 +727,11 @@ def _list_keys(context, key_prefix, delimiter):
     @gen.coroutine
     def _list_first_page():
         response = yield _list_objects(context, context.s3_bucket, key_prefix, delimiter, max_keys)
-        print(response)
         return _parse_list_response(response)
 
     @gen.coroutine
     def _list_later_page(token):
         response = yield _list_objects(context, context.s3_bucket, key_prefix, delimiter, max_keys, token)
-        print(response)
 
         return _parse_list_response(response)
 
@@ -772,7 +755,6 @@ def _list_keys(context, key_prefix, delimiter):
                 directories.append(item['Prefix'][:-1])
         if 'NextContinuationToken' in response:
             next_token = response['NextContinuationToken']
-        print((next_token, keys, directories))
         return (next_token, keys, directories)
 
     token, keys, directories = yield _list_first_page()
@@ -868,7 +850,20 @@ def _copy_object(context, bucket, source_file, destination_file):
     credentials = yield context.s3_auth()
     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
-    return s3_client.copy_object(Bucket=bucket, CopySource=source_file, Key=destination_file)
+    response = yield _get_object(context, context.s3_bucket, source_file)
+    file_bytes = response['Body'].read()
+    response = _put_object(context, context.s3_bucket, file_bytes, destination_file)
+    last_modified = f"{datetime.datetime.now():%a, %d %b %Y %H:%M:%S GMT}"
+    return _saved_model(destination_file.split('/')[-1], 'notebook', None, last_modified)
+
+
+# @gen.coroutine
+# def _copy_object(context, bucket, source_file, destination_file):
+#     credentials = yield context.s3_auth()
+#     s3_client = boto3.client('s3', aws_access_key_id=credentials.access_key_id,
+#                              aws_secret_access_key=credentials.secret_access_key, region_name='us-east-1', endpoint_url = context.endpoint_url)
+    
+#     return s3_client.copy_object(Bucket=bucket, CopySource=source_file, Key=destination_file)
 
 @gen.coroutine
 def _delete_object(context, bucket, file_name):
