@@ -8,7 +8,7 @@ from tornado import gen
 from .cortx_authenticator import CortxAuthenticator
 # from .utils import (MultiPartUploadHelper,_get_key,_get_path, _get_full_path,_get_type,_get_format,_get_type_from_key)
 from .utils import (
-    _run_sync,MultiPartUploadHelper,_check_directory_exists,_check_file_exists,_get_model,_save_model,_delete,_rename_notebook,_new_untitled_notebook,_new,_copy,_create_new_checkpoint,_restore_checkpoint,_list_all_checkpoints,_delete_checkpoint
+    _run_sync,MultiPartUploadHelper,_check_directory_exists,_check_file_exists,_get_model,_save_model,_delete_notebook,_rename_notebook,_new_untitled_notebook,_get_new_notebook,_copy_notebook,_create_new_checkpoint,_restore_notebook_checkpoint,_list_all_checkpoints,_delete_notebook_checkpoint
     )
 from .utils import *
 import json 
@@ -74,7 +74,8 @@ class CortxJupyter(ContentsManager):
         return _run_sync(file_exists_async)
 
     def get(self, path, content=True, type=None, format=None):
-
+        print('TESTI')
+        print(path,content,type,format)
         @gen.coroutine
         def get_async():
             return (yield _get_model(self._config(), path, content, type, format))
@@ -89,7 +90,7 @@ class CortxJupyter(ContentsManager):
     @gen.coroutine
     def delete(self, path):
         with (yield self.write_lock.acquire()):
-            yield _delete(self._config(), path)
+            yield _delete_notebook(self._config(), path)
 
     @gen.coroutine
     def update(self, model, path):
@@ -104,12 +105,12 @@ class CortxJupyter(ContentsManager):
     @gen.coroutine
     def new(self, model, path):
         with (yield self.write_lock.acquire()):
-            return (yield _new(self._config(), model, path))
+            return (yield _get_new_notebook(self._config(), model, path))
 
     @gen.coroutine
     def copy(self, from_path, to_path):
         with (yield self.write_lock.acquire()):
-            return (yield _copy(self._config(), from_path, to_path))
+            return (yield _copy_notebook(self._config(), from_path, to_path))
 
     @gen.coroutine
     def create_checkpoint(self, path):
@@ -119,7 +120,7 @@ class CortxJupyter(ContentsManager):
     @gen.coroutine
     def restore_checkpoint(self, checkpoint_id, path):
         with (yield self.write_lock.acquire()):
-            return (yield _restore_checkpoint(self._config(), checkpoint_id, path))
+            return (yield _restore_notebook_checkpoint(self._config(), checkpoint_id, path))
 
     @gen.coroutine
     def list_checkpoints(self, path):
@@ -128,9 +129,10 @@ class CortxJupyter(ContentsManager):
     @gen.coroutine
     def delete_checkpoint(self, checkpoint_id, path):
         with (yield self.write_lock.acquire()):
-            return (yield _delete_checkpoint(self._config(), checkpoint_id, path))
+            return (yield _delete_notebook_checkpoint(self._config(), checkpoint_id, path))
 
     def _config(self):
+        
         return Config(
             region=self.region_name,
             bucket_name=self.bucket_name,

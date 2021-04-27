@@ -131,6 +131,7 @@ def _list_objects(config, bucket, prefix, delimiter, max_keys, token=''):
             Prefix=prefix)
 
 
+
 def _get_key(config, path):
     return config.prefix + path.lstrip('/')
 
@@ -203,7 +204,7 @@ def _check_if_exists(config, path):
 def _get_model(config, path, content, type, format):
     type_to_get = type if type is not None else (yield _get_type(config, path))
     format_to_get = format if format is not None else _get_format(config, type_to_get, path)
-    return (yield GETTERS[(type_to_get, format_to_get)](config, path, content))
+    return (yield READ_HELPERS[(type_to_get, format_to_get)](config, path, content))
 
 
 @gen.coroutine
@@ -227,7 +228,7 @@ def _get_folder(config, path, content):
     key = _get_key(config, path)
     key_prefix = key if (key == '' or key[-1] == '/') else (key + '/')
     keys, directories = \
-        (yield _list_immediate_child_keys_and_directories(config, key_prefix)) if content else \
+        (yield _list_current_child_files_and_folders(config, key_prefix)) if content else \
         ([], [])
 
     all_keys = {key for (key, _) in keys}
@@ -267,7 +268,7 @@ def _save_model(config, model, path):
     save_type = model['type'] if 'type' in model else (yield _get_type(config, path))
     save_format = model['format'] if 'format' in model else _get_format(
         config, save_type, path)
-    return (yield SAVERS[(save_type, save_format)](
+    return (yield PUT_HELPERS[(save_type, save_format)](
         config,
         model['chunk'] if 'chunk' in model else None,
         model['content'] if 'content' in model else None,
@@ -396,9 +397,9 @@ def _create_new_checkpoint(config, path):
 
     checkpoint_id = str(int(time.time() * 1000000))
     checkpoint_path = _get_checkpoint_path(path, checkpoint_id)
-    yield SAVERS[(type, format)](config, None, content, checkpoint_path)
+    yield PUT_HELPERS[(type, format)](config, None, content, checkpoint_path)
     # This is a new object, so shouldn't be any eventual consistency issues
-    checkpoint = yield GETTERS[(type, format)](config, checkpoint_path, False)
+    checkpoint = yield READ_HELPERS[(type, format)](config, checkpoint_path, False)
     return {
         'id': checkpoint_id,
         'last_modified': checkpoint['last_modified'],
@@ -407,7 +408,7 @@ def _create_new_checkpoint(config, path):
 @gen.coroutine
 def _list_all_checkpoints(config, path):
     key_prefix = _get_key(config, path + '/' + CHECKPOINT_NAME + '/')
-    keys, _ = yield _list_immediate_child_keys_and_directories(config, key_prefix)
+    keys, _ = yield _list_current_child_files_and_folders(config, key_prefix)
     return [
         {
             'id': key[(key.rfind('/' + CHECKPOINT_NAME + '/') + len('/' + CHECKPOINT_NAME + '/')):],
@@ -437,14 +438,14 @@ def _rename_notebook(config, old_path, new_path):
 
     renames = object_key + [
         (key, replace_key_prefix(key))
-        for (key, _) in (yield _list_all_descendant_keys(config, old_key + '/'))
+        for (key, _) in (yield _list_all_successor_keys(config, old_key + '/'))
     ]
 
-    for (old_key, new_key) in object_key + sorted(renames, key=lambda k: _copy_sort_key(k[0])):
-        yield _copy_key(config, old_key, new_key)
+    for (old_key, new_key) in object_key + sorted(renames, key=lambda k: _get_copy_order_key(k[0])):
+        yield _copy_key_object(config, old_key, new_key)
 
-    for (old_key, _) in sorted(renames, key=lambda k: _delete_sort_key(k[0])) + object_key:
-        yield _delete_key(config, old_key)
+    for (old_key, _) in sorted(renames, key=lambda k: _delete_order_key(k[0])) + object_key:
+        yield _delete_key_object(config, old_key)
 
     return (yield _get_model(config, new_path, content=False, type=None, format=None))
 
@@ -476,7 +477,7 @@ def _new_untitled_notebook(config, path, type, ext):
     model = {
         'type': model_type,
     }
-    return (yield _new(config, model, path))
+    return (yield _get_new_notebook(config, model, path))
 
 
 
@@ -502,43 +503,8 @@ def _run_sync(func):
     else:
         return result
 
-
-#----------------------------------------------------------------------------------#
-
-def _copy_sort_key(key):
-    return (key.count('/'), 0 if key.endswith(FOLDER_SEPERATOR) else 1)
-
-
-def _delete_sort_key(key):
-    return tuple(-1 * key_i for key_i in _copy_sort_key(key))
-
 @gen.coroutine
-def _get_model_at_checkpoint(config, type, checkpoint_id, path):
-    format = _get_format(config, type, path)
-    checkpoint_path = _get_checkpoint_path(path, checkpoint_id)
-    return (yield GETTERS[(type, format)](config, checkpoint_path, True))
-
-
-@gen.coroutine
-def _restore_checkpoint(config, checkpoint_id, path):
-    type = (yield _get_model(config, path, content=False, type=None, format=None))['type']
-    model = yield _get_model_at_checkpoint(config, type, checkpoint_id, path)
-    yield _save_model(config, model, path)
-
-
-@gen.coroutine
-def _delete_checkpoint(config, checkpoint_id, path):
-    checkpoint_path = _get_checkpoint_path(path, checkpoint_id)
-    yield _delete(config, checkpoint_path)
-
-@gen.coroutine
-def _copy_key(config, old_key, new_key):
-
-    yield _copy_object(config, config.bucket_name, old_key, new_key)
-
-
-@gen.coroutine
-def _delete(config, path):
+def _delete_notebook(config, path):
     if not path:
         raise HTTPServerError(400, "Can't delete root")
 
@@ -551,20 +517,43 @@ def _delete(config, path):
 
     descendant_keys = [
         key
-        for (key, _) in (yield _list_all_descendant_keys(config, root_key + '/'))
+        for (key, _) in (yield _list_all_successor_keys(config, root_key + '/'))
     ]
 
-    for key in sorted(descendant_keys, key=_delete_sort_key) + object_key:
-        yield _delete_key(config, key)
+    for key in sorted(descendant_keys, key=_delete_order_key) + object_key:
+        yield _delete_key_object(config, key)
 
 
 @gen.coroutine
-def _delete_key(config, key):
-    yield _delete_object(config, config.bucket_name, key)
+def _get_checkpoint_model(config, type, checkpoint_id, path):
+    format = _get_format(config, type, path)
+    checkpoint_path = _get_checkpoint_path(path, checkpoint_id)
+    return (yield READ_HELPERS[(type, format)](config, checkpoint_path, True))
 
 
 @gen.coroutine
-def _new(config, model, path):
+def _delete_notebook_checkpoint(config, checkpoint_id, path):
+    checkpoint_path = _get_checkpoint_path(path, checkpoint_id)
+    yield _delete_notebook(config, checkpoint_path)
+
+
+@gen.coroutine
+def _list_current_child_files_and_folders(config, key_prefix):
+    return (yield _get_all_keys(config, key_prefix, '/'))
+
+@gen.coroutine
+def _list_all_successor_keys(config, key_prefix):
+    return (yield _get_all_keys(config, key_prefix, ''))[0]
+
+@gen.coroutine
+def _restore_notebook_checkpoint(config, checkpoint_id, path):
+    type = (yield _get_model(config, path, content=False, type=None, format=None))['type']
+    model = yield _get_checkpoint_model(config, type, checkpoint_id, path)
+    yield _save_model(config, model, path)
+
+
+@gen.coroutine
+def _get_new_notebook(config, model, path):
     if model is None:
         model = {}
 
@@ -580,8 +569,9 @@ def _new(config, model, path):
     return (yield _save_model(config, model, path))
 
 
+
 @gen.coroutine
-def _copy(config, from_path, to_path):
+def _copy_notebook(config, from_path, to_path):
     model = yield _get_model(config, from_path, content=False, type=None, format=None)
     if model['type'] == 'directory':
         raise HTTPServerError(400, "Can't copy directories")
@@ -603,7 +593,7 @@ def _copy(config, from_path, to_path):
     from_key = _get_key(config, from_path)
     to_key = _get_key(config, to_path)
 
-    yield _copy_key(config, from_key, to_key)
+    yield _copy_key_object(config, from_key, to_key)
     return {
         **model,
         'name': to_name,
@@ -612,17 +602,7 @@ def _copy(config, from_path, to_path):
 
 
 @gen.coroutine
-def _list_immediate_child_keys_and_directories(config, key_prefix):
-    return (yield _list_keys(config, key_prefix, '/'))
-
-
-@gen.coroutine
-def _list_all_descendant_keys(config, key_prefix):
-    return (yield _list_keys(config, key_prefix, ''))[0]
-
-
-@gen.coroutine
-def _list_keys(config, key_prefix, delimiter):
+def _get_all_keys(config, key_prefix, delimiter):
 
     max_keys = 1000
 
@@ -668,18 +648,34 @@ def _list_keys(config, key_prefix, delimiter):
 
     return keys, directories
 
-GETTERS = {
-    ('notebook', 'json'): _get_notebook,
-    ('file', 'text'): _get_text_file,
-    ('file', 'base64'):  _get_base64_file,
-    ('directory', 'json'): _get_folder,
+READ_HELPERS = {
+('directory', 'json'): _get_folder,
+('notebook', 'json'): _get_notebook,
+('file', 'text'): _get_text_file,
+('file', 'base64'): _get_base64_file
 }
 
-
-SAVERS = {
+PUT_HELPERS = {
+   ('file', 'base64'):  _save_base64_file,
     ('notebook', 'json'): _save_notebook,
-    ('file', 'text'): _save_text_file,
-    ('file', 'base64'):  _save_base64_file,
     ('directory', 'json'): _save_folder,
+    ('file', 'text'): _save_text_file
 }
+
+@gen.coroutine
+def _delete_key_object(config, key):
+    yield _delete_object(config, config.bucket_name, key)
+
+
+@gen.coroutine
+def _copy_key_object(config, old_key, new_key):
+    yield _copy_object(config, config.bucket_name, old_key, new_key)
+
+
+def _get_copy_order_key(key):
+    return (key.count('/'), 0 if key.endswith(FOLDER_SEPERATOR) else 1)
+
+def _delete_order_key(key):
+    return tuple(-1 * key_i for key_i in _get_copy_order_key(key))
+
 
