@@ -5,6 +5,10 @@
 
 **Built for [Seagate Cortx Hackathon 2021](https://seagate-cortx-hackathon.devpost.com/)**
 
+<div align="center">
+  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_header.png"><br>
+</div>
+
 No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
 When you opt to use a plain Jupyter notebook as your development environment, everything is saved in your local machine. If you want your Jupyter notebooks to be accessible to you from anywhere or any device, then *Cortx Jupyter Integration*  is the way to go. All of your Jupyter notebooks, checkpoints and data files are saved in your *Cortx Object Storage*, so that you can access it from anywhere on the go.  
@@ -15,7 +19,6 @@ You don't have to worry about having notebooks and data saved in different place
  
  ## Features
  
-
  - Seamlessly Save notebooks, checkpoints, data files to Cortx.
  - Save multiple checkpoints for each notebooks to Cortx.
  - Checkpoints are saved to Cortx, under the key `<file_name>/.checkpoints/`. 
@@ -81,8 +84,8 @@ Now, edit the `~/.jupyter/jupyter_notebook_config.py`  file.
 
 **Following Configuration options are available on CortxAuthenticator:**
 
-`access_key_id`*(required)* 
-`secret_access_key`*(required)* 
+`access_key_id` *(required)* 
+`secret_access_key` *(required)* 
 
 You can get these credentials
 
@@ -114,4 +117,6 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
+
 [Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
+
