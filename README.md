@@ -16,9 +16,6 @@ When you opt to use a plain Jupyter notebook as your development environment, ev
 *Cortx Jupyter Integration* can be used by developers and organizations who want a central repository of Notebooks, Checkpoints and Files. This feature can help multiple developers across an organization to collaborate with each other. *Cortx Jupyter Integration* integration periodically saves updates to your notebook as checkpoints to *Cortx Object Storage* so that you can either revert to a previous checkpoint or your colleague can continue working on the Jupyter Notebook from where you left. 
 
 You don't have to worry about having notebooks and data saved in different places. With **Cortx Jupyter**, you can have them together on **CORTX: World's Only 100% Open Source Mass-Capacity Optimized Object Store**. Now, you can concentrate on Machine Learning while *Cortx Jupyter* does the boring work of saving and tracking your work.
-<<<<<<< HEAD
-
-=======
  
  ## Features
  
@@ -34,7 +31,6 @@ You don't have to worry about having notebooks and data saved in different place
  - Jupyter Notebook is not blocked when requests are made to Cortx as everything has been implemented asynchronously.
  - View, Upload and Download any types of files that are in Cortx using Jupyter
   
->>>>>>> 30ef0933eb2e8790418ef5bfd5833297901519ba
 ## Prerequisites
 
 ###  Setup Cortx
@@ -50,8 +46,9 @@ https://github.com/Seagate/cortx/blob/main/QUICK_START.md
 
 Install the Cortx Jupyter python package using the following command:
 
-    pip install cortx-jupyter
 
+
+    pip install cortx-jupyter
 
 You can find the package on [pypi.org](https://pypi.org/project/cortx-jupyter/)
 
@@ -85,14 +82,14 @@ Now, edit the `~/.jupyter/jupyter_notebook_config.py`  file.
     c.CortxJupyter.prefix = "notebooks/test/"
 
 
-#### Following Configuration options are available on CortxAuthenticator
+**Following Configuration options are available on CortxAuthenticator:**
 
 `access_key_id` *(required)* 
 `secret_access_key` *(required)* 
 
 You can get these credentials
 
-#### Following Configuration options are available on CortxJupyter
+**Following Configuration options are available on CortxJupyter:**
 
 `endpoint_url`*(required)* - Endpoint URL of your Cortx instance.
 Example: ```http://uvo1ettj69aisne19p9.vm.cld.sr```
@@ -102,6 +99,12 @@ Example: ```testbucket```
 
 `prefix`*(required)*  - Path in the bucket where you want to store your notebook.
 Example: ```notebooks/test/```
+
+## Architecture
+
+<div align="center">
+  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_architecture.png"><br>
+</div>
 
 ## How we built it?
 
@@ -120,6 +123,5 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
-
 [Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
 
