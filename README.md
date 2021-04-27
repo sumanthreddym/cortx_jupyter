@@ -5,6 +5,10 @@
 
 **Built for [Seagate Cortx Hackathon 2021](https://seagate-cortx-hackathon.devpost.com/)**
 
+<div align="center">
+  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_header.png"><br>
+</div>
+
 No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
 When you opt to use a plain Jupyter notebook as your development environment, everything is saved in your local machine. If you want your Jupyter notebooks to be accessible to you from anywhere or any device, then *Cortx Jupyter Integration*  is the way to go. All of your Jupyter notebooks, checkpoints and data files are saved in your *Cortx Object Storage*, so that you can access it from anywhere on the go.  
@@ -12,7 +16,25 @@ When you opt to use a plain Jupyter notebook as your development environment, ev
 *Cortx Jupyter Integration* can be used by developers and organizations who want a central repository of Notebooks, Checkpoints and Files. This feature can help multiple developers across an organization to collaborate with each other. *Cortx Jupyter Integration* integration periodically saves updates to your notebook as checkpoints to *Cortx Object Storage* so that you can either revert to a previous checkpoint or your colleague can continue working on the Jupyter Notebook from where you left. 
 
 You don't have to worry about having notebooks and data saved in different places. With **Cortx Jupyter**, you can have them together on **CORTX: World's Only 100% Open Source Mass-Capacity Optimized Object Store**. Now, you can concentrate on Machine Learning while *Cortx Jupyter* does the boring work of saving and tracking your work.
+<<<<<<< HEAD
 
+=======
+ 
+ ## Features
+ 
+ - Seamlessly Save notebooks, checkpoints, data files to Cortx.
+ - Save multiple checkpoints for each notebooks to Cortx.
+ - Checkpoints are saved to Cortx, under the key `<file_name>/.checkpoints/`. 
+ - Restore from any of the previous checkpoints.
+ - Multiple checkpoints are saved.
+ - Already, have notebooks on S3? No worries, **Cortx Jupyter integration** can help you can switch easily from S3 to Cortx Open Source object storage.
+ - Read large amount of data to your notebook directly from Cortx High Performance Object Storage for Machine Learning tasks.
+ - Delete Notebooks, Files that you don't need from Cortx.
+ - Renaming Notebook name automatically updates Notebook and Checkpoint names on Cortx.
+ - Jupyter Notebook is not blocked when requests are made to Cortx as everything has been implemented asynchronously.
+ - View, Upload and Download any types of files that are in Cortx using Jupyter
+  
+>>>>>>> 30ef0933eb2e8790418ef5bfd5833297901519ba
 ## Prerequisites
 
 ###  Setup Cortx
@@ -98,4 +120,6 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
+
 [Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
+
