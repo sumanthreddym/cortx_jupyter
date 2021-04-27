@@ -101,9 +101,8 @@ ENV/
 # mypy
 .mypy_cache/
 
-#Notebook
-.ipynb_checkpoints
-*.ipynb
+
+
 
 
 *.credentials
