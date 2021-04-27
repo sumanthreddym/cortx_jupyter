@@ -70,6 +70,7 @@ c.CortxJupyter.prefix = "notebooks/test/"
 **Following Configuration options are available on CortxAuthenticator:**
 
 `access_key_id`*(required)* 
+
 `secret_access_key`*(required)* 
 
 You can get these credentials
