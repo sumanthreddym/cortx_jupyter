@@ -1,2 +1,2 @@
 from .cortx_jupyter import CortxJupyter
-from .cortx_jupyter import CortxAuthenticator
+from .cortx_authenticator import CortxAuthenticator
