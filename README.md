@@ -103,7 +103,7 @@ Example: ```notebooks/test/```
 ## Architecture
 
 <div align="center">
-  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_architecture.png"><br>
+  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png"><br>
 </div>
 
 ## How we built it?
