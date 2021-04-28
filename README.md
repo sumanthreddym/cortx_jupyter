@@ -26,12 +26,17 @@ You can use Cortx Jupyter Integration to run any Jupyter Notebook that uses comp
  
 You can find the Python Package that we built at [pypi.org](https://pypi.org/project/cortx-jupyter/)
 
-### The integration in implemented in python 3, and consists of the following parts:
+## Architecture
+
+#### The integration in implemented in python 3, and consists of the following parts:
 
 - `cortx_authenticator.py`: Class that provides functionality to authenticate to Cortx.
 - `cortx_file_manager.py`: This Module provides methods that can be used by anyone importing cortx_jupyter Python package to use methods such as `read_data()`, `write_data()`, `read_model()` and `write_model()`.
 - `cortx_jupyter.py`: Class that provides core functionality of integrating Jupyter Notebook to Cortx. Jupyter Notebook calls the methods in this class to perform file operations instead of it's in-built File Manager.
 - `utils.py`: This class all the additional functionality such as using boto3 to send requests to Cortx.
+
+![architecture](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyer_architecture.png)
+
 
 ## Features
  
@@ -193,9 +198,6 @@ If you want more examples, take a look at the following sample notebooks:
 
 ![Checkpoints](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/revert_checkpoint.png)
 
-## Architecture
-
-![architecture](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyer_architecture.png)
 
 ## What we learned & Accomplishments that we're proud of
 
