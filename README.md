@@ -8,7 +8,7 @@
 
 ## Description
 
-Jupyter is widely used by all Data Scientists, Students and Industry to perform all types of Data Science tasks. Cortx is a high performance and scalable Object Storage. And we think that it is a match made in heaven to bring Jupyter and Cortx together!
+Jupyter is widely used by all Data Scientists, Researchers, Students and Software Enineers in the Industry to perform all types of Data Science tasks. Cortx is a high performance and scalable Object Storage. And we think that it is a match made in heaven to bring Jupyter and Cortx together!
 
 Haven't you had those scary moments when your disk crashes after you finished training a Machine Learning model on Jupyter Notebook after hours of work. No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter Integration** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
@@ -213,7 +213,7 @@ Watch the [Youtube video](https://youtu.be/TFZvOT2fbXw) to learn more about the 
 
 [Setup Instructions Video](https://youtu.be/GGAUWTDkhp8)
 
-## What's next for Cortx
+## What's next for Cortx Jupyter Integration
 
 - We aim to provide an option to switch between S3, Cortx and FileSystem.
 - Provide more methods in cortx_jupyter package.
