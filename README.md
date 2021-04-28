@@ -138,6 +138,10 @@ This will print some information about the notebook server in your terminal(as s
 
 It will then open your default web browser to this URL(as seen in the screenshot below). When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories present in Cortx.
 
+![Jupyter Cortx Files](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/jupyter_cortx_files.png)
+
+If you go to Cyberduck and list the files present in Cortx(as seen in the screenshot below), you can verify that all your Notebooks, Checkpoints and Data Files are stored on Cortx by the `Cortx Jupyter Integration`:
+
 ![Cyberduck](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cyberduck.jpeg)
 
 If you want some examples to get started on Jupyter Notebooks with Cortx as storage, take a look at the following sample notebooks in our repository:
@@ -195,9 +199,6 @@ The screenshot below shows that you can load data from Cortx and pass it to any 
 
 ![Read and Write](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/read_write_cortx_jupyter.png)
 
-You can view all your Notebooks(as seen in the screenshot below), Checkpoints and Data Files stored on Cortx using Jupyter Dashboard(thanks to Cortx Jupyter Integration):
-
-![Jupyter Cortx Files](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/jupyter_cortx_files.png)
 
 ## Revert Checkpoints
 
