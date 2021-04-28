@@ -3,6 +3,7 @@ import boto3
 from io import BytesIO
 import joblib
 import pandas as pd
+import numpy as np
 
 config_file_path = "credentials.json" 
 
@@ -20,6 +21,8 @@ def write_data(file_name, data):
     config = _config()
     if isinstance(data, pd.DataFrame):
         data = data.to_csv(index=False).encode()
+    elif isinstance(data,(np.ndarray, np.generic)):
+        data = data.tobytes()
     _put_object(config, config['bucket_name'], data, file_name)
 
 
