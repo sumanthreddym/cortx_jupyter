@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 
 config_file_path = "credentials.json" 
+from tensorflow.keras.models import model_from_json
+
 
 def _config():
     cfg = {}
@@ -17,6 +19,7 @@ def read_data(file_name):
     config = _config()
     return BytesIO(_get_object(config, config['bucket_name'], file_name)['Body'].read())
 
+
 def write_data(file_name, data):
     config = _config()
     if isinstance(data, pd.DataFrame):
@@ -25,13 +28,18 @@ def write_data(file_name, data):
         data = data.tobytes()
     _put_object(config, config['bucket_name'], data, file_name)
 
-
-def write_model(file_name, data):
+# Supports tensorflow and keras
+def write_model(file_name, model):
     config = _config()
-    with BytesIO() as f:
-        joblib.dump(data, f)
-        f.seek(0)
-        _put_object(config, config['bucket_name'], f, file_name)
+    data = model.to_json()
+    _put_object(config, config['bucket_name'], data, file_name)
+
+# Supports tensorflow and keras
+def read_model(file_name):
+    config = _config()
+    response = _get_object(config, config['bucket_name'], file_name)['Body'].read().decode('utf-8')
+    return model_from_json(response)
+
 
 
 def _put_object(config, bucket, body, object_name):
