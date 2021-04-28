@@ -6,7 +6,7 @@
 
 ## What is it?
 
-[Cortx Jupyter Integration](https://devpost.com/software/cortx-jupyter) is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to save and manage all of your Notebooks, Checkpoints and Data Files on Cortx.
+[Cortx Jupyter Integration](https://devpost.com/software/cortx-jupyter) is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to save and manage all of your Notebooks, Checkpoints and Data Files on Cortx. As a bonus, you can also use Cortx Jupyter Integration to load any pre-trained models from or to cortx server without any hassle of configuring or using Library specific integrations.
 
 ![logo](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyter_header.png)
 
@@ -22,7 +22,7 @@ When you opt to use a plain Jupyter notebook as your development environment, ev
 
 You don't have to worry about having notebooks and data saved in different places. With **Cortx Jupyter Integration**, you can have them together on **CORTX: World's Only 100% Open Source Mass-Capacity Optimized Object Store**. Now, you can concentrate on Machine Learning while *Cortx Jupyter* does the boring work of saving and tracking your work.
 
-When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data. Load data from Cortx into your Jupyter notebook using `Cortx Jupyter Integration` an pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
+You can use Cortx Jupyter Integration to run any Jupyter Notebook that uses complex Machine Learning or Deep Learning models without dependency on the Library's native configuration files. ie., When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data or using another ML Library specific integration to build ML models such as Pytorch, Tensorflow, Keras, etc. `Cortx Jupyter Integration` provides an easy way to Load data from Cortx into your Jupyter notebook  and pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
  
 You can find the Python Package that we built at [pypi.org](https://pypi.org/project/cortx-jupyter/)
 
