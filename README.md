@@ -131,6 +131,12 @@ It will then open your default web browser to this URL. When the notebook opens 
 
 ![Cyberduck](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cyberduck.jpeg)
 
+If you want some examples to get started on Jupyter Notebooks with Cortx as storage, take a look at the following sample notebooks in our repository:
+
+ - [Tensorflow example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Tensorflow-Demo.ipynb)
+ - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
+ - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
+
 ## Use any Machine Learning library to train models on data stored in Cortx
 
 When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data. Load data from Cortx into your Jupyter notebook using `Cortx Jupyter Integration` an pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
