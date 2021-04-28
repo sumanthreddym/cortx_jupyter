@@ -132,11 +132,11 @@ Use the following command on Linux-like systems to run Jupyter Notebook server:
 
     jupyter notebook
 
-This will print some information about the notebook server in your terminal, including the URL of the web application (by default,  `http://localhost:8888`):
+This will print some information about the notebook server in your terminal(as seen in the screenshot below), including the URL of the web application (by default,  `http://localhost:8888`):
 
 ![Jupyter Notebook Run](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/jupyter_run.png)
 
-It will then open your default web browser to this URL. When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories present in Cortx.
+It will then open your default web browser to this URL(as seen in the screenshot below). When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories present in Cortx.
 
 ![Cyberduck](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cyberduck.jpeg)
 
@@ -191,8 +191,13 @@ If you want more examples, take a look at the following sample notebooks:
  - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
  - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
 
+The screenshot below shows that you can load data from Cortx and pass it to any ML library or Write data to Cortx using simple methods provided in our Cortx Jupyter Python Package:
+
 ![Read and Write](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/read_write_cortx_jupyter.png)
-![Cyberduck](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/jupyter_cortx_files.png)
+
+You can view all your Notebooks(as seen in the screenshot below), Checkpoints and Data Files stored on Cortx using Jupyter Dashboard(thanks to Cortx Jupyter Integration):
+
+![Jupyter Cortx Files](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/jupyter_cortx_files.png)
 
 ## Revert Checkpoints
 
