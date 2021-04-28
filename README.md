@@ -8,7 +8,7 @@
 
 ## Description
 
-Jupyter is widely used by all Data Scientists, Researchers, Students and Software Enineers in the Industry to perform all types of Data Science tasks. Cortx is a high performance and scalable Object Storage. And we think that it is a match made in heaven to bring Jupyter and Cortx together!
+Jupyter is widely used by all Data Scientists, Researchers, Students and Engineers across the Software Industry to perform all types of Data Science tasks. Cortx is a high performance and scalable Object Storage. And we think that it is a match made in heaven to bring them together!
 
 Haven't you had those scary moments when your disk crashes after you finished training a Machine Learning model on Jupyter Notebook after hours of work. No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter Integration** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
@@ -141,7 +141,14 @@ Import Cortx Jupyter Python Package's methods into your notebook using the follo
 
 There are 4 methods available to work work with data when using Cortx and Jupter Notebook.
 
- ![Cortx Jupyter API](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyter_API.png)
+|API method| Description |Parameters|
+|--|--|--|
+| **read_data()**  | Reads any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
+| **write_data()**  | Writes any type of data to Cortx. | file_name, data |
+| **read_mode()**  | Reads a trained Machine Learning model from Cortx. | file_name, model |
+| **write_model()**  | Writes a trained Machine Learning model to Cortx. | file_name, model |
+ 
+ 
 
  **read_data() Example:**
  
