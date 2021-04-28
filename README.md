@@ -1,5 +1,6 @@
 
 
+
 # Cortx Jupyter Integration
 
 ### Jupyter Notebook Integration for Cortx Object Storage.
@@ -8,13 +9,15 @@
 
 ![logo](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_header.png)
 
-No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
+No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter Integration** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
 When you opt to use a plain Jupyter notebook as your development environment, everything is saved in your local machine. If you want your Jupyter notebooks to be accessible to you from anywhere or any device, then *Cortx Jupyter Integration*  is the way to go. All of your Jupyter notebooks, checkpoints and data files are saved in your *Cortx Object Storage*, so that you can access it from anywhere on the go.  
 
 *Cortx Jupyter Integration* can be used by developers and organizations who want a central repository of Notebooks, Checkpoints and Files. This feature can help multiple developers across an organization to collaborate with each other. *Cortx Jupyter Integration* integration periodically saves updates to your notebook as checkpoints to *Cortx Object Storage* so that you can either revert to a previous checkpoint or your colleague can continue working on the Jupyter Notebook from where you left. 
 
-You don't have to worry about having notebooks and data saved in different places. With **Cortx Jupyter**, you can have them together on **CORTX: World's Only 100% Open Source Mass-Capacity Optimized Object Store**. Now, you can concentrate on Machine Learning while *Cortx Jupyter* does the boring work of saving and tracking your work.
+You don't have to worry about having notebooks and data saved in different places. With **Cortx Jupyter Integration**, you can have them together on **CORTX: World's Only 100% Open Source Mass-Capacity Optimized Object Store**. Now, you can concentrate on Machine Learning while *Cortx Jupyter* does the boring work of saving and tracking your work.
+
+When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data. Load data from Cortx into your Jupyter notebook using `Cortx Jupyter Integration` an pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
  
  ## Features
  
@@ -24,7 +27,8 @@ You don't have to worry about having notebooks and data saved in different place
  - Restore from any of the previous checkpoints.
  - Multiple checkpoints are saved.
  - Already, have notebooks on S3? No worries, **Cortx Jupyter integration** can help you can switch easily from S3 to Cortx Open Source object storage.
- - Read large amount of data to your notebook directly from Cortx High Performance Object Storage for Machine Learning tasks.
+ - Use **Cortx Jupyter integration's** `read_data()` and `write_data()` APIs to Read and Write large amount of data to and from your notebook directly from Cortx High Performance Object Storage for Machine Learning tasks.
+ - Use **Cortx Jupyter integration's** `read_model()` and `write_model()` APIs to Save and Load Machine learning models from Cortx High Performance Object Storage for Machine Learning tasks.
  - Delete Notebooks, Files that you don't need from Cortx.
  - Renaming Notebook name automatically updates Notebook and Checkpoint names on Cortx.
  - Jupyter Notebook is not blocked when requests are made to Cortx as everything has been implemented asynchronously.
@@ -99,9 +103,21 @@ Example: ```testbucket```
 `prefix`*(required)*  - Path in the bucket where you want to store your notebook.
 Example: ```notebooks/test/```
 
-## Architecture
+### 3. Test if it works
 
-![architecture](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png)
+Now that we have completed installation and configuration, it is time to run Jupyter Notebook and check if the Jupyter Cortx magic works!
+
+Use the following command on Linux-like systems to run Jupyter Notebook server:
+
+    jupyter notebook
+
+This will print some information about the notebook server in your terminal, including the URL of the web application (by default,  `http://localhost:8888`):
+
+![Jupyter Notebook Run](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_run.png)
+
+It will then open your default web browser to this URL. When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories present in Cortx.
+
+![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_cortx_files.png)
 
 ## Use any Machine Learning library to train models on data stored in Cortx
 
@@ -109,14 +125,16 @@ When you use `Cortx Jupyter Integration`, there is no need for changing configur
 
 Import Cortx Jupyter Python Package's methods into your notebook using the following statements:
 
-    from cortx_jupyter import read_data, write_data
+    from cortx_jupyter import read_data, write_data, read_model, write_model
 
-There are 2 methods available to work work with data when using Cortx and Jupter Notebook.
+There are 4 methods available to work work with data when using Cortx and Jupter Notebook.
 
 |API method| Description |Parameters|
 |--|--|--|
-| **read_data()**  | Read any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
-| **write_data()**  | Write any type of data to Cortx. | file_name, data |
+| **read_data()**  | Reads any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
+| **write_data()**  | Writes any type of data to Cortx. | file_name, data |
+| **read_mode()**  | Reads a trained Machine Learning model from Cortx. | file_name, model |
+| **write_model()**  | Writes a trained Machine Learning model to Cortx. | file_name, model |
  
  **read_data() Example:**
  
@@ -143,6 +161,15 @@ If you want more examples, take a look at the following sample notebooks:
  - [Tensorflow example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Tensorflow-Demo.ipynb)
  - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
  - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
+![Read and Write](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/read_write_cortx_jupyter.png)
+![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/cyberduck.jpeg)
+## Revert Checkpoints
+
+![Checkpoints](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/revert_checkpoint.png)
+
+## Architecture
+
+![architecture](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png)
 
 ## How we built it?
 
@@ -161,5 +188,6 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
-[Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
 
+
+[Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
