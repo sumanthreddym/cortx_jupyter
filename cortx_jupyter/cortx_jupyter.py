@@ -6,7 +6,6 @@ from notebook.services.contents.manager import ContentsManager
 from collections import namedtuple
 from tornado import gen
 from .cortx_authenticator import CortxAuthenticator
-# from .utils import (MultiPartUploadHelper,_get_key,_get_path, _get_full_path,_get_type,_get_format,_get_type_from_key)
 from .utils import (
     _run_sync,MultiPartUploadHelper,_check_directory_exists,_check_file_exists,_get_model,_save_model,_delete_notebook,_rename_notebook,_new_untitled_notebook,_get_new_notebook,_copy_notebook,_create_new_checkpoint,_restore_notebook_checkpoint,_list_all_checkpoints,_delete_notebook_checkpoint
     )
@@ -20,11 +19,6 @@ Config = namedtuple('Config', [
  'prefix', 'region', 'bucket_name', 'host_name', 'cortx_authenticator',
     'multipart_uploads', 'endpoint_url'
 ])
-
-
-# class Datetime(TraitType):
-#     klass = datetime.datetime
-#     default_value = datetime.datetime(1900, 1, 1)
 
 class CortxJupyter(ContentsManager):
 
@@ -76,8 +70,7 @@ class CortxJupyter(ContentsManager):
         return _run_sync(file_exists_async)
 
     def get(self, path, content=True, type=None, format=None):
-        print('TESTI')
-        print(path,content,type,format)
+
         @gen.coroutine
         def get_async():
             c = yield self._config()
@@ -158,11 +151,6 @@ class CortxJupyter(ContentsManager):
 
         with open('credentials.json',"w") as fp:
             json.dump(creds,fp)
-
-
-        print(json.load(open("credentials.json","r")))
-        # with open('credentials.json',"r") as fp):
-        #     print(json.load(fp))
 
         return Config(
             region=self.region_name,

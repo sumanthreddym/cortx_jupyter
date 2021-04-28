@@ -5,9 +5,7 @@
 
 **Built for [Seagate Cortx Hackathon 2021](https://seagate-cortx-hackathon.devpost.com/)**
 
-<div align="center">
-  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_header.png"><br>
-</div>
+![logo](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyter_header.png)
 
 No more losing precious work because you forgot to save changes or no more worrying about local filesystem crashes or paying exorbitant subscription fees for Premium features of Hosted Jupyter Notebooks. **Cortx Jupyter** is here to save you from all these! **Cortx Jupyter** is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to store all of your Jupyter Notebooks, Checkpoints and Data Files on **Cortx Object Storage** instead of Jupyter's standard filesystem-backed storage.
 
@@ -102,9 +100,7 @@ Example: ```notebooks/test/```
 
 ## Architecture
 
-<div align="center">
-  <img src="https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png"><br>
-</div>
+![architecture](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png)
 
 ## How we built it?
 

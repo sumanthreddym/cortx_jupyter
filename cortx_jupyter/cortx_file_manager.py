@@ -1,6 +1,7 @@
 import json 
 import boto3
 from io import BytesIO
+import joblib
 import pandas as pd
 
 config_file_path = "credentials.json" 
@@ -20,6 +21,14 @@ def write_data(file_name, data):
     if isinstance(data, pd.DataFrame):
         data = data.to_csv(index=False).encode()
     _put_object(config, config['bucket_name'], data, file_name)
+
+
+def write_model(file_name, data):
+    config = _config()
+    with BytesIO() as f:
+        joblib.dump(data, f)
+        f.seek(0)
+        _put_object(config, config['bucket_name'], f, file_name)
 
 
 def _put_object(config, bucket, body, object_name):
