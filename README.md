@@ -1,6 +1,4 @@
 
-
-
 # Cortx Jupyter Integration
 
 ### Jupyter Notebook Integration for Cortx Object Storage.
