@@ -1,4 +1,5 @@
 
+
 # Cortx Jupyter Integration
 
 ### Jupyter Notebook Integration for Cortx Object Storage.
@@ -101,6 +102,47 @@ Example: ```notebooks/test/```
 ## Architecture
 
 ![architecture](https://github.com/sumanthreddym/cortx-jupyter/blob/main/media/cortx_jupyer_architecture.png)
+
+## Use any Machine Learning library to train models on data stored in Cortx
+
+When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data. Load data from Cortx into your Jupyter notebook using `Cortx Jupyter Integration` an pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
+
+Import Cortx Jupyter Python Package's methods into your notebook using the following statements:
+
+    from cortx_jupyter import read_data, write_data
+
+There are 2 methods available to work work with data when using Cortx and Jupter Notebook.
+
+|API method| Description |Parameters|
+|--|--|--|
+| **read_data()**  | Read any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
+| **write_data()**  | Write any type of data to Cortx. | file_name, data |
+ 
+ **read_data() Example:**
+ 
+    from cortx_jupyter import read_data, write_data
+    
+    import pandas as pd
+    
+    data = read_data('ionosphere.csv')
+	df = pd.read_csv(data, header=None)                                                                                                                          
+
+In above example, take a look at how we load data from Cortx using `Cortx Jupyter Integration` . You can pass it to different ML libraries. **You can load data from Cortx to Jupyter to work with Keras, Tensorflow, Pytorch, etc using the following method. There is absolutely no dependency on the ML library that you are working with.** (thanks to `Cortx Jupyter Integration`)!
+
+ **write_data() Example:**
+ 
+    from cortx_jupyter import read_data, write_data
+    
+    import pandas as pd
+    
+    data = write_data('filename.csv', df)
+
+
+If you want more examples, take a look at the following sample notebooks:
+
+ - [Tensorflow example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Tensorflow-Demo.ipynb)
+ - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
+ - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
 
 ## How we built it?
 
