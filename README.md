@@ -1,5 +1,6 @@
 
 
+
 # Cortx Jupyter Integration
 
 ### Jupyter Notebook Integration for Cortx Object Storage.
@@ -125,12 +126,14 @@ Import Cortx Jupyter Python Package's methods into your notebook using the follo
 
     from cortx_jupyter import read_data, write_data
 
-There are 2 methods available to work work with data when using Cortx and Jupter Notebook.
+There are 4 methods available to work work with data when using Cortx and Jupter Notebook.
 
 |API method| Description |Parameters|
 |--|--|--|
-| **read_data()**  | Read any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
-| **write_data()**  | Write any type of data to Cortx. | file_name, data |
+| **read_data()**  | Reads any type of data from Cortx into a variable in Python that you can pass as input to different libraries. |  file_name |
+| **write_data()**  | Writes any type of data to Cortx. | file_name, data |
+| **read_mode()**  | Reads a trained Machine Learning model from Cortx. | file_name, model |
+| **write_model()**  | Writes a trained Machine Learning model to Cortx. | file_name, model |
  
  **read_data() Example:**
  
