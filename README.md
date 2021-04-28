@@ -45,6 +45,8 @@ https://github.com/Seagate/cortx/blob/main/QUICK_START.md
 
 ## Setup Instructions
 
+[Setup Instructions Video](https://youtu.be/GGAUWTDkhp8)
+
 ### 1. Installation
 
 Install the Cortx Jupyter python package using the following command:
@@ -187,6 +189,7 @@ Watch the [Youtube video](https://youtu.be/TFZvOT2fbXw) to learn more about the 
 
 [Complete Information](https://youtu.be/cgLWvrlB75Q)
 [Features Demo](https://youtu.be/TFZvOT2fbXw)
+[Setup Instructions Video](https://youtu.be/GGAUWTDkhp8)
 
 
 ## Contributors:
