@@ -1,8 +1,12 @@
-# Cortx Jupyter Integration
+# [Cortx Jupyter Integration](https://devpost.com/software/cortx-jupyter)
 
 ### Jupyter Notebook Integration for Cortx Object Storage.
 
-**Built for [Seagate Cortx Hackathon 2021](https://seagate-cortx-hackathon.devpost.com/)**
+**Built for [Seagate Cortx Hackathon 2021](https://devpost.com/software/cortx-jupyter)**
+
+## What is it?
+
+[Cortx Jupyter Integration](https://devpost.com/software/cortx-jupyter) is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to save and manage all of your Notebooks, Checkpoints and Data Files on Cortx.
 
 ![logo](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyter_header.png)
 
