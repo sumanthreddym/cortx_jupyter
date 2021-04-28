@@ -183,7 +183,8 @@ If you want more examples, take a look at the following sample notebooks:
  
 ## Demo Video
 
-Watch the video to learn more about the project.
+Watch the [Youtube video](https://youtu.be/TFZvOT2fbXw) to learn more about the project.
+
 
 ## Contributors:
 
