@@ -158,7 +158,7 @@ Import Cortx Jupyter Python Package's methods into your notebook using the follo
 
     from cortx_jupyter import read_data, write_data, read_model, write_model
 
-There are 4 methods available to work work with data when using Cortx and Jupter Notebook.
+Following 4 methods are available to work work with data when using Cortx and Jupter Notebook.
 
 |API method| Description |Parameters|
 |--|--|--|
