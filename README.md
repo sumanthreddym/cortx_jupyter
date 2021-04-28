@@ -17,7 +17,16 @@ You don't have to worry about having notebooks and data saved in different place
 
 When you use `Cortx Jupyter Integration`, there is no need for changing configuration files or worrying about library native way of fetching data. Load data from Cortx into your Jupyter notebook using `Cortx Jupyter Integration` an pass it to any Machine Learning library. *As we promised before, you only have to worry about Machine Learning, we worry about Jupyter and Cortx integration!*
  
- ## Features
+For your convenience, we have published our `Jupyter Notebook Integration` Python Package that we built at [pypi.org](https://pypi.org/project/cortx-jupyter/).
+
+### THE INTEGRATION IS IMPLEMENTED IN PYTHON 3, AND CONSISTS OF THE FOLLOWING PARTS:
+
+- `cortx_jupyter/cortx_authenticator.py`: Class that provides functionality to authenticate to Cortx.
+- `cortx_jupyter/cortx_file_manager.py`: This Module provides methods that can be used by anyone importing cortx_jupyter Python package to use methods such as `read_data()`, `write_data()`, `read_model()` and `write_model()`.
+- `cortx_jupyter/cortx_jupyter.py`: Class that provides core functionality of integrating Jupyter Notebook to Cortx. Jupyter Notebook calls the methods in this class to perform file operations instead of it's in-built File Manager.
+- `cortx_jupyter/utils.py`: This class all the additional functionality such as using boto3 to send requests to Cortx.
+
+## Features
  
  - Seamlessly Save notebooks, checkpoints, data files to Cortx.
  - Save multiple checkpoints for each notebooks to Cortx.
@@ -31,7 +40,7 @@ When you use `Cortx Jupyter Integration`, there is no need for changing configur
  - Renaming Notebook name automatically updates Notebook and Checkpoint names on Cortx.
  - Jupyter Notebook is not blocked when requests are made to Cortx as everything has been implemented asynchronously.
  - View, Upload and Download any types of files that are in Cortx using Jupyter
-  
+
 ## Prerequisites
 
 ###  Setup Cortx
@@ -49,15 +58,13 @@ https://github.com/Seagate/cortx/blob/main/QUICK_START.md
 
 Install the Cortx Jupyter python package using the following command:
 
-
-
     pip install cortx-jupyter
 
 You can find the package on [pypi.org](https://pypi.org/project/cortx-jupyter/)
 
 ### 2. Add Jupyter Config
 
-Configure Jupyter to use `Cortx Jupyter` for its storage backend. This can be done by modifying your notebook config file. On a Unix-like system, your Jupyter Notebook config will be located at `~/.jupyter/jupyter_notebook_config.py`
+Configure Jupyter to our `Cortx Jupyter`integration for its storage backend. This can be done by modifying your notebook config file. On a Unix-like system, your Jupyter Notebook config will be located at `~/.jupyter/jupyter_notebook_config.py`
 
 **NOTE:** If you can't find this config file on your machine, you can create this file using the following command in terminal:
 
@@ -88,6 +95,7 @@ Now, edit the `~/.jupyter/jupyter_notebook_config.py`  file.
 **Following Configuration options are available on CortxAuthenticator:**
 
 `access_key_id` *(required)* 
+
 `secret_access_key` *(required)* 
 
 You can get these credentials
