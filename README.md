@@ -185,6 +185,9 @@ If you want more examples, take a look at the following sample notebooks:
 
 Watch the [Youtube video](https://youtu.be/TFZvOT2fbXw) to learn more about the project.
 
+[Complete Information](https://youtu.be/cgLWvrlB75Q)
+[Features Demo](https://youtu.be/TFZvOT2fbXw)
+
 
 ## Contributors:
 
