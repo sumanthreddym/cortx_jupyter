@@ -187,7 +187,12 @@ If you want more examples, take a look at the following sample notebooks:
  - Python Package Index
  - Jupyter
  - boto3
+ - Pandas
+ - Keras
  - tornado
+ - numpy
+ - joblib
+ - tensorflow
  
 ## Demo Video
 
