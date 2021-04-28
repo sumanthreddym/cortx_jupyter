@@ -28,7 +28,7 @@ When you use `Cortx Jupyter Integration`, there is no need for changing configur
  - Multiple checkpoints are saved.
  - Already, have notebooks on S3? No worries, **Cortx Jupyter integration** can help you can switch easily from S3 to Cortx Open Source object storage.
  - Use **Cortx Jupyter integration's** `read_data()` and `write_data()` APIs to Read and Write large amount of data to and from your notebook directly from Cortx High Performance Object Storage for Machine Learning tasks.
- - Use **Cortx Jupyter integration's** `read_model()` and `write_model()` APIs to Save and Load Machine learning models from Cortx High Performance Object Storage for Machine Learning tasks.
+ - Use **Cortx Jupyter integration's** `read_model()` and `write_model()` APIs to Save and Load a pre-trained model Machine learning models from Cortx High Performance Object Storage for Machine Learning tasks.
  - Delete Notebooks, Files that you don't need from Cortx.
  - Renaming Notebook name automatically updates Notebook and Checkpoint names on Cortx.
  - Jupyter Notebook is not blocked when requests are made to Cortx as everything has been implemented asynchronously.
