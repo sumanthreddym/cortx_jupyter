@@ -158,10 +158,10 @@ If you want more examples, take a look at the following sample notebooks:
  - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
  - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
 ![Read and Write](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/read_write_cortx_jupyter.png)
-![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/cyberduck.png)
+![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/cyberduck.jpeg)
 ## Revert Checkpoints
 
-![Checkpoints](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/Revert_checkpoint.png)
+![Checkpoints](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/revert_checkpoint.png)
 
 ## Architecture
 
@@ -184,4 +184,6 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
+
+
 [Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
