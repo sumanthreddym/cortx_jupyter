@@ -8,7 +8,7 @@
 
 [Cortx Jupyter Integration](https://devpost.com/software/cortx-jupyter) is an Open Source python package which combines the power of Cortx and Jupyter Notebooks to empower you to save and manage all of your Notebooks, Checkpoints and Data Files on Cortx. As a bonus, you can also use Cortx Jupyter Integration to load any pre-trained models from or to cortx server without any hassle of configuring or using Library specific integrations.
 
-![logo](https://raw.githubusercontent.com/sumanthreddym/cortx_jupyter/main/media/cortx_jupyter_header.png)
+![logo](/media/cortx_jupyter_header.png)
 
 ## Description
 
