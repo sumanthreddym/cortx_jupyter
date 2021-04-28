@@ -111,11 +111,11 @@ Use the following command on Linux-like systems to run Jupyter Notebook server:
 
 This will print some information about the notebook server in your terminal, including the URL of the web application (by default,  `http://localhost:8888`):
 
-![Jupyter Notebook Run](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_run.jpeg)
+![Jupyter Notebook Run](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_run.png)
 
 It will then open your default web browser to this URL. When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories present in Cortx.
 
-![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_cortx_files.jpeg)
+![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/jupyter_cortx_files.png)
 
 ## Use any Machine Learning library to train models on data stored in Cortx
 
@@ -157,11 +157,11 @@ If you want more examples, take a look at the following sample notebooks:
  - [Tensorflow example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Tensorflow-Demo.ipynb)
  - [Pytorch example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Pytorch-Demo.ipynb)
  - [Keras example](https://github.com/sumanthreddym/cortx_jupyter/blob/main/Examples/Keras-Demo.ipynb)
-![Read and Write](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/read_write_cortx_jupyter.jpeg)
-![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/cyberduck.jpeg)
+![Read and Write](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/read_write_cortx_jupyter.png)
+![Cyberduck](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/cyberduck.png)
 ## Revert Checkpoints
 
-![Checkpoints](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/Revert_checkpoint.jpeg)
+![Checkpoints](https://github.com/sumanthreddym/cortx_jupyter/blob/main/media/Revert_checkpoint.png)
 
 ## Architecture
 
@@ -184,7 +184,4 @@ Watch the video to learn more about the project.
 ## Contributors:
 
 [Sumanth Reddy Muni](https://www.linkedin.com/in/sumanthmuni/)
-
 [Priyadarshini Murugan](https://www.linkedin.com/in/priya-murugan/)
-
-
